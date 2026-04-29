@@ -1,368 +1,1023 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Assistant IA — Clinique Dentaire St-Laurent</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Fraunces:wght@400;600&display=swap" rel="stylesheet">
+<title>AI Chatbot — Universal Language Demo</title>
+<meta name="description" content="Multilingual AI assistant 24/7 for SMBs. Detects any language automatically.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --dark: #0e0e14;
-    --dark2: #16161f;
-    --dark3: #1e1e2a;
+    --bg: #0a0a0f;
+    --bg2: #13131c;
+    --bg3: #1c1c28;
+    --bg4: #252533;
     --accent: #4ade80;
     --accent2: #22c55e;
-    --text: #f0f0f0;
-    --muted: #8888a0;
-    --border: rgba(255,255,255,0.07);
-    --bubble-bot: #1e1e2a;
+    --accent-dim: #166534;
+    --text: #f5f5f7;
+    --text-dim: #a1a1aa;
+    --text-muted: #71717a;
+    --border: rgba(255,255,255,0.06);
+    --border-bright: rgba(255,255,255,0.12);
+    --bubble-bot: #1c1c28;
     --bubble-user: #166534;
-    --radius: 16px;
+    --radius: 18px;
+    --radius-sm: 12px;
   }
+
+  html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--dark);
+    font-family: 'DM Sans', 'Noto Sans Arabic', -apple-system, sans-serif;
+    background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .page-bg {
+  .bg-glow {
     position: fixed; inset: 0; z-index: 0;
-    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(74,222,128,0.08) 0%, transparent 70%);
     pointer-events: none;
+    overflow: hidden;
   }
 
-  .container {
-    position: relative; z-index: 1;
-    width: 100%; max-width: 480px;
+  .bg-glow::before, .bg-glow::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    animation: float 20s ease-in-out infinite;
   }
 
-  .branding {
+  .bg-glow::before {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #166534, transparent);
+    top: -200px; left: -100px;
+  }
+
+  .bg-glow::after {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #1e40af, transparent);
+    bottom: -150px; right: -100px;
+    animation-delay: -10s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .hero {
     text-align: center;
-    margin-bottom: 24px;
-    animation: fadeUp 0.5s ease both;
+    margin-bottom: 56px;
+    animation: fadeUp 0.7s ease both;
   }
 
-  .branding h1 {
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.2);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(34px, 6vw, 56px);
+    font-weight: 600;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    margin-bottom: 18px;
+    background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  @media (max-width: 920px) {
+    .main-grid { grid-template-columns: 1fr; gap: 32px; }
+  }
+
+  .features { animation: fadeUp 0.7s 0.1s ease both; }
+  .feature-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+
+  .feature {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    transition: all 0.25s ease;
+  }
+
+  .feature:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-2px);
+  }
+
+  .feature-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(74,222,128,0.1);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .feature-icon svg { width: 18px; height: 18px; stroke: var(--accent); }
+
+  .feature h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+  }
+
+  .feature p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
     font-family: 'Fraunces', serif;
     font-size: 22px;
     font-weight: 600;
-    color: #fff;
-    letter-spacing: -0.3px;
-  }
-
-  .branding p {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  .lang-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(74,222,128,0.1);
-    border: 1px solid rgba(74,222,128,0.25);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 11px;
     color: var(--accent);
-    margin-top: 8px;
+    letter-spacing: -0.5px;
   }
-
-  .lang-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
 
   .chat-card {
-    background: var(--dark2);
-    border: 1px solid var(--border);
+    background: var(--bg2);
+    border: 1px solid var(--border-bright);
     border-radius: var(--radius);
     overflow: hidden;
-    animation: fadeUp 0.5s 0.1s ease both;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,222,128,0.05);
+    animation: fadeUp 0.7s 0.2s ease both;
+    position: sticky;
+    top: 24px;
   }
 
   .chat-header {
-    padding: 14px 18px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: var(--dark3);
+    gap: 12px;
+    background: var(--bg3);
   }
 
   .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg, #166534, #4ade80);
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent-dim), var(--accent));
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: 500; color: #fff; flex-shrink: 0;
+    flex-shrink: 0;
+    position: relative;
   }
 
-  .header-info { flex: 1; }
-  .header-name { font-size: 14px; font-weight: 500; }
-  .header-status { font-size: 11px; color: var(--accent); display: flex; align-items: center; gap: 5px; margin-top: 1px; }
-  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .avatar svg { width: 20px; height: 20px; stroke: #fff; }
+
+  .avatar::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; right: -2px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2.5px solid var(--bg3);
+  }
+
+  .header-info { flex: 1; min-width: 0; }
+  .header-name {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
+  }
+  .header-status {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .lang-badge {
+    font-size: 10px;
+    background: rgba(74,222,128,0.12);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    border: 0.5px solid rgba(74,222,128,0.2);
+    transition: all 0.3s ease;
+    min-width: 36px;
+    text-align: center;
+  }
 
   .chat-messages {
-    height: 360px;
+    height: 420px;
     overflow-y: auto;
-    padding: 16px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     scrollbar-width: thin;
-    scrollbar-color: var(--dark3) transparent;
+    scrollbar-color: var(--bg4) transparent;
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.2) 100%),
+      var(--bg2);
   }
 
+  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 10px; }
+
   .msg {
-    max-width: 84%;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 13.5px;
+    max-width: 85%;
+    padding: 11px 15px;
+    border-radius: 16px;
+    font-size: 14px;
     line-height: 1.55;
-    animation: msgIn 0.2s ease both;
+    animation: msgIn 0.25s ease both;
+    word-wrap: break-word;
+    white-space: pre-line;
   }
 
   .msg.bot {
     background: var(--bubble-bot);
     border: 1px solid var(--border);
     align-self: flex-start;
-    border-bottom-left-radius: 4px;
-    color: var(--text);
+    border-bottom-left-radius: 5px;
   }
 
   .msg.user {
     background: var(--bubble-user);
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
     color: #dcfce7;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 4px 12px rgba(22,101,52,0.3);
   }
 
-  .msg.typing-indicator {
-    display: flex; gap: 4px; align-items: center;
-    padding: 12px 16px;
+  /* RTL support */
+  .msg.rtl { direction: rtl; text-align: right; }
+
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 14px 18px;
+    background: var(--bubble-bot);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-bottom-left-radius: 5px;
+    align-self: flex-start;
+    max-width: 80px;
   }
 
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: bounce 1.4s ease-in-out infinite;
+  }
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
 
   .pills-wrap {
-    padding: 10px 14px;
-    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 12px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
     border-top: 1px solid var(--border);
-    min-height: 52px;
+    min-height: 56px;
+    background: var(--bg2);
     align-items: flex-start;
   }
 
-  .pill {
-    font-size: 11.5px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: 'DM Sans', sans-serif;
+  .pills-label {
+    width: 100%;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 4px;
   }
 
-  .pill:hover { background: rgba(74,222,128,0.1); border-color: var(--accent); color: var(--accent); }
+  .pill {
+    font-size: 12px;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--border-bright);
+    background: var(--bg3);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'DM Sans', 'Noto Sans Arabic', sans-serif;
+    font-weight: 400;
+  }
+
+  .pill:hover {
+    background: rgba(74,222,128,0.08);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .pill:active { transform: translateY(0); }
 
   .input-row {
     display: flex;
     gap: 8px;
-    padding: 10px 14px 14px;
+    padding: 14px 16px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg3);
   }
 
   .input-row input {
     flex: 1;
-    background: var(--dark3);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 9px 14px;
-    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--border-bright);
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-size: 14px;
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Noto Sans Arabic', sans-serif;
     outline: none;
-    transition: border-color 0.15s;
+    transition: all 0.2s;
   }
 
-  .input-row input:focus { border-color: rgba(74,222,128,0.4); }
-  .input-row input::placeholder { color: var(--muted); }
+  .input-row input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(74,222,128,0.1);
+  }
+
+  .input-row input::placeholder { color: var(--text-muted); }
 
   .send-btn {
     background: var(--accent2);
     border: none;
-    border-radius: 10px;
-    width: 38px; height: 38px;
-    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.15s, transform 0.1s;
+    transition: all 0.15s;
   }
 
-  .send-btn:hover { background: var(--accent); }
+  .send-btn:hover { background: var(--accent); transform: scale(1.05); }
   .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-  .send-btn svg { width: 16px; height: 16px; fill: #fff; }
+  .send-btn svg { width: 18px; height: 18px; fill: #0a0a0f; }
 
-  .footer-note {
+  .credits {
     text-align: center;
-    font-size: 10.5px;
-    color: var(--muted);
-    margin-top: 14px;
-    animation: fadeUp 0.5s 0.2s ease both;
+    margin-top: 60px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    animation: fadeUp 0.7s 0.4s ease both;
   }
 
-  .footer-note a { color: var(--accent); text-decoration: none; }
+  .credits strong { color: var(--text-dim); font-weight: 500; }
+  .credits .accent { color: var(--accent); }
 
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes bounce { 0%,80%,100% { transform: translateY(0); opacity: 0.5; } 40% { transform: translateY(-7px); opacity: 1; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 </style>
 </head>
 <body>
 
-<div class="page-bg"></div>
+<div class="bg-glow"></div>
 
-<div class="container">
-  <div class="branding">
-    <h1>Clinique Dentaire St-Laurent</h1>
-    <p>Assistant virtuel · Virtual assistant</p>
-    <div class="lang-pill">
-      <div class="lang-dot"></div>
-      <span id="lang-label">Détection de la langue...</span>
+<div class="page">
+  <header class="hero">
+    <div class="hero-badge">
+      <div class="dot"></div>
+      <span>Speaks 12+ languages · Always on</span>
     </div>
-  </div>
+    <h1>Your business never <em>sleeps</em>.<br>Why should support?</h1>
+    <p>An AI assistant trained on YOUR business — answers customer questions instantly, in any language, day and night. Try typing in English, Français, العربية, Español, Deutsch... it just works.</p>
+  </header>
 
-  <div class="chat-card">
-    <div class="chat-header">
-      <div class="avatar">CS</div>
-      <div class="header-info">
-        <div class="header-name">Assistant IA</div>
-        <div class="header-status"><div class="status-dot"></div><span id="status-text">En ligne · Online</span></div>
+  <div class="main-grid">
+
+    <aside class="features">
+      <div class="feature-list">
+        <div class="feature">
+          <div class="feature-icon">
+            <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3>Universal language detection</h3>
+          <p>French, English, Arabic, Spanish, German, Portuguese, Italian, and more — auto-detected from the first word.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <h3>Always on</h3>
+          <p>Answers at 3am, on weekends, holidays. Never miss a lead because you were asleep.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Trained on your business</h3>
+          <p>Knows your hours, services, prices, location. Talks like part of your team.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>One line of code</h3>
+          <p>Drops into any website. WordPress, Wix, Shopify, custom — works everywhere.</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Online</div></div>
+        <div class="stat"><div class="stat-num">&lt; 1s</div><div class="stat-label">Response</div></div>
+        <div class="stat"><div class="stat-num">12+</div><div class="stat-label">Languages</div></div>
+      </div>
+    </aside>
+
+    <div class="chat-card">
+      <div class="chat-header">
+        <div class="avatar">
+          <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <div class="header-info">
+          <div class="header-name">AI Assistant</div>
+          <div class="header-status"><span id="status-text">Online</span></div>
+        </div>
+        <span class="lang-badge" id="lang-badge">EN</span>
+      </div>
+
+      <div class="chat-messages" id="msgs"></div>
+
+      <div class="pills-wrap" id="pills"></div>
+
+      <div class="input-row">
+        <input type="text" id="userInput" placeholder="Ask in any language..." onkeydown="if(event.key==='Enter')send()" autocomplete="off" />
+        <button class="send-btn" id="sendBtn" onclick="send()" aria-label="Send">
+          <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
       </div>
     </div>
 
-    <div class="chat-messages" id="msgs"></div>
-
-    <div class="pills-wrap" id="pills"></div>
-
-    <div class="input-row">
-      <input type="text" id="userInput" placeholder="Écrivez un message / Type a message..." onkeydown="if(event.key==='Enter')send()" />
-      <button class="send-btn" onclick="send()">
-        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
-      </button>
-    </div>
   </div>
 
-  <div class="footer-note">
-    Propulsé par IA · Powered by AI
-  </div>
+  <footer class="credits">
+    <p><strong>Demo</strong> — Try typing in any language: English, Français, العربية, Español, Deutsch, Português, Italiano, 日本語, 中文, 한국어, Русский, Türkçe.<br>
+    Built with <span class="accent">care</span> · Universal language detection · Plug-and-play setup</p>
+  </footer>
 </div>
 
 <script>
+// ============================================================
+// MULTI-LANGUAGE KNOWLEDGE BASE
+// ============================================================
 const KB = {
-  fr: {
-    welcome: "Bonjour! Je suis l'assistant virtuel de la Clinique Dentaire St-Laurent. Comment puis-je vous aider aujourd'hui?",
-    pills: ["Heures d'ouverture", "Prendre rendez-vous", "Urgence dentaire", "Assurances acceptées", "Nos services", "Localisation"],
-    answers: {
-      "heure|ouvert|horaire|fermé|weekend|samedi|dimanche": "Nous sommes ouverts:\n🗓 Lundi–Vendredi: 8h00–18h00\n🗓 Samedi: 9h00–14h00\n❌ Dimanche: Fermé",
-      "rendez|appoint|réserv|booking|book": "Pour prendre un rendez-vous:\n📞 (514) 555-0187\nLes nouveaux patients sont les bienvenus!",
-      "urgence|urgent|douleur|mal|cassé|brisé": "🚨 Urgence dentaire? Appelez immédiatement:\n📞 (514) 555-0187\nNous avons des plages réservées chaque jour pour les urgences.",
-      "assurance|insurance|couverture|régime": "Nous acceptons:\n✅ Sun Life\n✅ Great-West\n✅ Desjardins\n✅ Croix Bleue / Blue Cross\nContactez-nous pour confirmer votre couverture.",
-      "service|traitement|soin|blanchiment|implant|ortho|nettoyage": "Nos services incluent:\n• Examen et nettoyage\n• Blanchiment dentaire\n• Implants dentaires\n• Orthodontie\n• Soins d'urgence\nAppellez-nous pour plus d'info!",
-      "adresse|localisation|où|situé|trouver|stationnement": "📍 1234 Boulevard St-Laurent\nMontréal, QC H2X 2S9\n🚇 Métro Saint-Laurent (ligne verte)\n🅿️ Stationnement disponible",
-    },
-    fallback: "Merci pour votre question! Pour une réponse personnalisée, contactez-nous:\n📞 (514) 555-0187",
-    placeholder: "Écrivez votre message..."
-  },
   en: {
-    welcome: "Hello! I'm the virtual assistant for Clinique Dentaire St-Laurent. How can I help you today?",
-    pills: ["Opening hours", "Book appointment", "Dental emergency", "Accepted insurance", "Our services", "Location"],
-    answers: {
-      "hour|open|schedule|closed|weekend|saturday|sunday": "We are open:\n🗓 Monday–Friday: 8:00am–6:00pm\n🗓 Saturday: 9:00am–2:00pm\n❌ Sunday: Closed",
-      "appoint|book|reserv|schedul": "To book an appointment:\n📞 (514) 555-0187\nNew patients are always welcome!",
-      "emerg|urgent|pain|broke|crack|toothache": "🚨 Dental emergency? Call immediately:\n📞 (514) 555-0187\nWe reserve daily slots for urgent cases.",
-      "insur|coverage|plan|benefit": "We accept:\n✅ Sun Life\n✅ Great-West\n✅ Desjardins\n✅ Blue Cross / Croix Bleue\nContact us to confirm your coverage.",
-      "service|treatment|care|whitening|implant|ortho|cleaning|braces": "Our services include:\n• Exam & Cleaning\n• Teeth Whitening\n• Dental Implants\n• Orthodontics\n• Emergency Care\nCall us for more info!",
-      "address|location|where|find|parking|direction": "📍 1234 Boulevard St-Laurent\nMontréal, QC H2X 2S9\n🚇 Metro Saint-Laurent (green line)\n🅿️ Parking available",
-    },
-    fallback: "Thanks for your question! For a personalized answer, contact us:\n📞 (514) 555-0187",
-    placeholder: "Type your message..."
+    name: 'English',
+    rtl: false,
+    welcome: "Hi there! 👋 I'm your virtual AI assistant. I can answer customer questions 24/7 in any language. Try me in English, French, Arabic, Spanish — anything!",
+    pills: ["What services do you offer?", "Pricing", "How does it work?", "Contact"],
+    fallback: "Great question! 🤔 For a precise answer on that, I'd be trained on your specific business details. Want to discuss how I could help YOUR business?\n\n📧 Contact: your@email.com",
+    placeholder: "Ask in any language...",
+    status: "Online"
+  },
+  fr: {
+    name: 'Français',
+    rtl: false,
+    welcome: "Bonjour! 👋 Je suis votre assistant virtuel. Je peux répondre aux questions de vos clients 24h/24, dans n'importe quelle langue. Testez-moi en français, anglais, arabe, espagnol — tout!",
+    pills: ["Quels sont vos services?", "Tarifs", "Comment ça marche?", "Contact"],
+    fallback: "Bonne question! 🤔 Pour une réponse précise, je serais entraîné sur les détails de votre entreprise. Voulez-vous discuter de comment je pourrais aider VOTRE entreprise?\n\n📧 Contact: votre@email.com",
+    placeholder: "Posez une question...",
+    status: "En ligne"
+  },
+  ar: {
+    name: 'العربية',
+    rtl: true,
+    welcome: "مرحباً! 👋 أنا مساعدك الافتراضي. يمكنني الإجابة على أسئلة عملائك على مدار الساعة بأي لغة. جربني بالعربية أو الإنجليزية أو الفرنسية — أي شيء!",
+    pills: ["ما هي خدماتكم؟", "الأسعار", "كيف يعمل؟", "اتصل بنا"],
+    fallback: "سؤال رائع! 🤔 للحصول على إجابة دقيقة، سأكون مدرباً على تفاصيل عملك. هل تود مناقشة كيف يمكنني مساعدة عملك؟\n\n📧 تواصل: your@email.com",
+    placeholder: "اسأل بأي لغة...",
+    status: "متصل"
+  },
+  es: {
+    name: 'Español',
+    rtl: false,
+    welcome: "¡Hola! 👋 Soy tu asistente virtual. Puedo responder a las preguntas de tus clientes 24/7 en cualquier idioma. ¡Pruébame en español, inglés, francés, árabe — lo que sea!",
+    pills: ["¿Qué servicios ofrecen?", "Precios", "¿Cómo funciona?", "Contacto"],
+    fallback: "¡Buena pregunta! 🤔 Para una respuesta precisa, estaría entrenado con los detalles de tu negocio. ¿Quieres hablar sobre cómo podría ayudar a TU negocio?\n\n📧 Contacto: your@email.com",
+    placeholder: "Pregunta en cualquier idioma...",
+    status: "En línea"
+  },
+  de: {
+    name: 'Deutsch',
+    rtl: false,
+    welcome: "Hallo! 👋 Ich bin Ihr virtueller KI-Assistent. Ich beantworte Kundenfragen rund um die Uhr in jeder Sprache. Testen Sie mich auf Deutsch, Englisch, Französisch, Arabisch — was auch immer!",
+    pills: ["Welche Dienstleistungen?", "Preise", "Wie funktioniert es?", "Kontakt"],
+    fallback: "Gute Frage! 🤔 Für eine präzise Antwort würde ich auf Ihre Geschäftsdetails trainiert werden. Möchten Sie besprechen, wie ich IHREM Unternehmen helfen könnte?\n\n📧 Kontakt: your@email.com",
+    placeholder: "Frage in jeder Sprache...",
+    status: "Online"
+  },
+  pt: {
+    name: 'Português',
+    rtl: false,
+    welcome: "Olá! 👋 Sou seu assistente virtual de IA. Posso responder às perguntas dos seus clientes 24/7 em qualquer idioma. Experimente em português, inglês, francês, árabe — qualquer coisa!",
+    pills: ["Quais são os serviços?", "Preços", "Como funciona?", "Contato"],
+    fallback: "Ótima pergunta! 🤔 Para uma resposta precisa, eu seria treinado nos detalhes do seu negócio. Quer conversar sobre como eu poderia ajudar SEU negócio?\n\n📧 Contato: your@email.com",
+    placeholder: "Pergunte em qualquer idioma...",
+    status: "Online"
+  },
+  it: {
+    name: 'Italiano',
+    rtl: false,
+    welcome: "Ciao! 👋 Sono il tuo assistente virtuale AI. Posso rispondere alle domande dei tuoi clienti 24/7 in qualsiasi lingua. Provami in italiano, inglese, francese, arabo — qualsiasi cosa!",
+    pills: ["Quali servizi offrite?", "Prezzi", "Come funziona?", "Contatto"],
+    fallback: "Ottima domanda! 🤔 Per una risposta precisa, sarei addestrato sui dettagli della tua attività. Vuoi discutere di come potrei aiutare la TUA azienda?\n\n📧 Contatto: your@email.com",
+    placeholder: "Chiedi in qualsiasi lingua...",
+    status: "Online"
+  },
+  ru: {
+    name: 'Русский',
+    rtl: false,
+    welcome: "Привет! 👋 Я ваш виртуальный ИИ-ассистент. Я могу отвечать на вопросы ваших клиентов 24/7 на любом языке. Попробуйте на русском, английском, французском, арабском — на чём угодно!",
+    pills: ["Какие услуги?", "Цены", "Как это работает?", "Контакт"],
+    fallback: "Отличный вопрос! 🤔 Для точного ответа я бы был обучен на деталях вашего бизнеса. Хотите обсудить, как я мог бы помочь ВАШЕМУ бизнесу?\n\n📧 Контакт: your@email.com",
+    placeholder: "Спросите на любом языке...",
+    status: "В сети"
+  },
+  zh: {
+    name: '中文',
+    rtl: false,
+    welcome: "你好！👋 我是您的虚拟AI助手。我可以全天候用任何语言回答客户的问题。用中文、英文、法文、阿拉伯文 — 任何语言都可以！",
+    pills: ["你们提供什么服务？", "价格", "如何运作？", "联系"],
+    fallback: "好问题！🤔 为了给您准确的答复，我需要接受关于您业务细节的培训。想讨论一下我如何帮助您的业务吗？\n\n📧 联系: your@email.com",
+    placeholder: "用任何语言提问...",
+    status: "在线"
+  },
+  ja: {
+    name: '日本語',
+    rtl: false,
+    welcome: "こんにちは！👋 私はあなたのバーチャルAIアシスタントです。24時間365日、どんな言語でもお客様の質問にお答えできます。日本語、英語、フランス語、アラビア語など、何でも試してみてください！",
+    pills: ["どんなサービスがありますか？", "料金", "どのように機能しますか？", "お問い合わせ"],
+    fallback: "素晴らしい質問です！🤔 正確な回答のために、私はあなたのビジネスの詳細について訓練されるでしょう。あなたのビジネスをどのように支援できるかについて話し合いたいですか？\n\n📧 連絡先: your@email.com",
+    placeholder: "どんな言語でも質問してください...",
+    status: "オンライン"
+  },
+  ko: {
+    name: '한국어',
+    rtl: false,
+    welcome: "안녕하세요! 👋 저는 당신의 가상 AI 어시스턴트입니다. 24시간 어떤 언어로든 고객 질문에 답할 수 있습니다. 한국어, 영어, 프랑스어, 아랍어 — 무엇이든 시도해보세요!",
+    pills: ["어떤 서비스가 있나요?", "가격", "어떻게 작동하나요?", "연락처"],
+    fallback: "좋은 질문입니다! 🤔 정확한 답변을 위해 귀하의 비즈니스 세부사항에 대해 교육받을 것입니다. 귀하의 비즈니스를 어떻게 도울 수 있을지 논의하시겠습니까?\n\n📧 연락처: your@email.com",
+    placeholder: "어떤 언어로든 질문하세요...",
+    status: "온라인"
+  },
+  tr: {
+    name: 'Türkçe',
+    rtl: false,
+    welcome: "Merhaba! 👋 Sanal AI asistanınızım. Müşteri sorularını 7/24 herhangi bir dilde yanıtlayabilirim. Türkçe, İngilizce, Fransızca, Arapça — istediğiniz dili deneyin!",
+    pills: ["Hangi hizmetleri sunuyorsunuz?", "Fiyatlar", "Nasıl çalışır?", "İletişim"],
+    fallback: "Harika soru! 🤔 Kesin bir cevap için işletmenizin detayları üzerinde eğitileceğim. SİZİN işletmenize nasıl yardımcı olabileceğimi konuşmak ister misiniz?\n\n📧 İletişim: your@email.com",
+    placeholder: "Herhangi bir dilde sorun...",
+    status: "Çevrimiçi"
   }
 };
 
-const frWords = /\b(bonjour|salut|merci|oui|non|je|nous|vous|est|les|des|une|comment|pourquoi|quand|heures|rendez|urgence|dentaire|assurance|service|localisation|ouvert|fermé|prix|coût|traitement|soins|douleur|besoin|avoir|faire|vouloir|pouvez)\b/i;
-const enWords = /\b(hello|hi|thanks|yes|no|i|we|you|is|the|a|an|how|why|when|hours|appointment|emergency|dental|insurance|service|location|open|closed|price|cost|treatment|care|pain|need|can|you|please|help)\b/i;
+// ============================================================
+// ANSWERS — keys are universal, replies match detected language
+// Using SEMANTIC matching (works across languages via keywords)
+// ============================================================
+const ANSWERS = {
+  services: {
+    keys: {
+      en: /\b(service|offer|do you|what.*you.*do|specialt|provide|business)\b/i,
+      fr: /\b(service|offre|proposez|faites|spécialité|fournis|prestations|activité)\b/i,
+      ar: /(خدم|تقدم|عمل|نشاط|اختصاص)/,
+      es: /\b(servicio|ofrec|hace|especialid|negoci)\b/i,
+      de: /\b(dienst|service|angebot|biet|geschäft|spezial)\b/i,
+      pt: /\b(serviço|ofere|faz|especialid|negócio)\b/i,
+      it: /\b(servizi|offer|fa|specialit|attività)\b/i,
+      ru: /\b(услуг|предлаг|занима|специал|бизнес)\b/i,
+      zh: /(服务|提供|做|业务|专业)/,
+      ja: /(サービス|提供|事業|業務)/,
+      ko: /(서비스|제공|사업|업무)/,
+      tr: /\b(hizmet|sun|yap|iş|özellik)\b/i
+    },
+    replies: {
+      en: "We offer a full range of services tailored to your needs. This assistant can be customized for your specific business — it'll know your services, pricing, and processes.\n\n💡 This is a generic demo. For your business, I'd be trained on your actual services.",
+      fr: "Nous offrons une gamme complète de services adaptés à vos besoins. Cet assistant peut être personnalisé pour votre entreprise — il connaîtra vos services, prix et processus.\n\n💡 C'est un demo générique. Pour votre entreprise, je serais entraîné sur vos vrais services.",
+      ar: "نقدم مجموعة كاملة من الخدمات المصممة خصيصًا لتلبية احتياجاتك. يمكن تخصيص هذا المساعد لعملك المحدد — سيعرف خدماتك وأسعارك وعملياتك.\n\n💡 هذا عرض توضيحي عام. لعملك، سأكون مدربًا على خدماتك الفعلية.",
+      es: "Ofrecemos una gama completa de servicios adaptados a tus necesidades. Este asistente puede personalizarse para tu negocio específico — conocerá tus servicios, precios y procesos.\n\n💡 Esto es una demo genérica. Para tu negocio, estaría entrenado con tus servicios reales.",
+      de: "Wir bieten eine umfassende Palette von Dienstleistungen, die auf Ihre Bedürfnisse zugeschnitten sind. Dieser Assistent kann für Ihr spezifisches Unternehmen angepasst werden.\n\n💡 Dies ist eine generische Demo. Für Ihr Unternehmen wäre ich auf Ihre tatsächlichen Dienstleistungen trainiert.",
+      pt: "Oferecemos uma gama completa de serviços adaptados às suas necessidades. Este assistente pode ser personalizado para o seu negócio específico.\n\n💡 Esta é uma demo genérica. Para o seu negócio, eu seria treinado nos seus serviços reais.",
+      it: "Offriamo una gamma completa di servizi adatti alle tue esigenze. Questo assistente può essere personalizzato per la tua attività specifica.\n\n💡 Questa è una demo generica. Per la tua attività, sarei addestrato sui tuoi servizi reali.",
+      ru: "Мы предлагаем полный спектр услуг, адаптированных к вашим потребностям. Этот помощник можно настроить для вашего конкретного бизнеса.\n\n💡 Это общая демонстрация. Для вашего бизнеса я был бы обучен на ваших реальных услугах.",
+      zh: "我们提供全方位的定制服务以满足您的需求。这个助手可以为您的特定业务定制 — 它将了解您的服务、定价和流程。\n\n💡 这是一个通用演示。对于您的业务，我将接受关于您实际服务的培训。",
+      ja: "お客様のニーズに合わせたフルレンジのサービスを提供しています。このアシスタントは、お客様の特定のビジネス向けにカスタマイズできます。\n\n💡 これは一般的なデモです。お客様のビジネスでは、実際のサービスについて訓練されます。",
+      ko: "귀하의 요구에 맞는 전체 서비스를 제공합니다. 이 어시스턴트는 귀하의 특정 비즈니스에 맞게 사용자 정의할 수 있습니다.\n\n💡 이것은 일반 데모입니다. 귀하의 비즈니스를 위해 실제 서비스에 대해 훈련받게 됩니다.",
+      tr: "İhtiyaçlarınıza göre uyarlanmış tam bir hizmet yelpazesi sunuyoruz. Bu asistan, özel işletmeniz için özelleştirilebilir.\n\n💡 Bu genel bir demodur. İşletmeniz için gerçek hizmetleriniz üzerinde eğitilirim."
+    }
+  },
+  pricing: {
+    keys: {
+      en: /\b(price|pricing|cost|how much|pay|fee|charge|expensive|cheap|budget)\b/i,
+      fr: /\b(prix|tarif|coût|combien|payer|frais|cher|économique|budget)\b/i,
+      ar: /(سعر|تكلف|كم|دفع|رسم|غالي|رخيص|ميزانية)/,
+      es: /\b(precio|coste|cuánto|pagar|tarifa|caro|barato|presupuesto)\b/i,
+      de: /\b(preis|kost|wie viel|bezahl|gebühr|teuer|günstig|budget)\b/i,
+      pt: /\b(preço|custo|quanto|pagar|tarifa|caro|barato|orçamento)\b/i,
+      it: /\b(prezzo|costo|quanto|pagare|tariffa|caro|economico|budget)\b/i,
+      ru: /\b(цен|стоимост|сколько|плат|тариф|дорого|дешево|бюджет)\b/i,
+      zh: /(价格|多少|付|费用|贵|便宜|预算)/,
+      ja: /(価格|料金|いくら|支払|費用|高い|安い|予算)/,
+      ko: /(가격|얼마|지불|요금|비싸|저렴|예산)/,
+      tr: /\b(fiyat|ücret|ne kadar|öde|pahalı|ucuz|bütçe)\b/i
+    },
+    replies: {
+      en: "💰 Our AI assistant service:\n\n• Setup: $99 (one-time)\n• Monthly: $79/month\n• Includes: multilingual support, updates, training\n\nSavings vs part-time employee: ~$3,000/month.",
+      fr: "💰 Notre service d'assistant IA:\n\n• Setup: 99$ (une fois)\n• Mensuel: 79$/mois\n• Inclut: support multilingue, mises à jour, entraînement\n\nÉconomies vs employé temps partiel: ~3000$/mois.",
+      ar: "💰 خدمة المساعد الذكي لدينا:\n\n• الإعداد: 99$ (مرة واحدة)\n• شهرياً: 79$ شهرياً\n• تشمل: دعم متعدد اللغات، تحديثات، تدريب\n\nالتوفير مقابل موظف بدوام جزئي: حوالي 3000$ شهرياً.",
+      es: "💰 Nuestro servicio de asistente IA:\n\n• Configuración: $99 (una vez)\n• Mensual: $79/mes\n• Incluye: soporte multilingüe, actualizaciones, entrenamiento\n\nAhorro vs empleado a tiempo parcial: ~$3,000/mes.",
+      de: "💰 Unser KI-Assistenten-Service:\n\n• Einrichtung: $99 (einmalig)\n• Monatlich: $79/Monat\n• Inkl.: mehrsprachiger Support, Updates, Training\n\nErsparnis vs. Teilzeitmitarbeiter: ~$3.000/Monat.",
+      pt: "💰 Nosso serviço de assistente IA:\n\n• Configuração: $99 (única vez)\n• Mensal: $79/mês\n• Inclui: suporte multilíngue, atualizações, treinamento\n\nEconomia vs funcionário meio período: ~$3,000/mês.",
+      it: "💰 Il nostro servizio di assistente IA:\n\n• Setup: $99 (una tantum)\n• Mensile: $79/mese\n• Include: supporto multilingue, aggiornamenti, training\n\nRisparmio vs dipendente part-time: ~$3,000/mese.",
+      ru: "💰 Наша услуга AI-ассистента:\n\n• Настройка: $99 (разово)\n• Ежемесячно: $79/месяц\n• Включает: многоязычная поддержка, обновления, обучение\n\nЭкономия vs сотрудник на полставки: ~$3,000/месяц.",
+      zh: "💰 我们的AI助手服务：\n\n• 设置费：$99（一次性）\n• 月费：$79/月\n• 包含：多语言支持、更新、培训\n\n相比兼职员工节省：约$3,000/月。",
+      ja: "💰 私たちのAIアシスタントサービス：\n\n• セットアップ：$99（一回）\n• 月額：$79/月\n• 含まれる：多言語サポート、更新、トレーニング\n\nパートタイム従業員と比較した節約：約$3,000/月。",
+      ko: "💰 AI 어시스턴트 서비스:\n\n• 설정: $99 (일회)\n• 월간: $79/월\n• 포함: 다국어 지원, 업데이트, 교육\n\n파트타임 직원 대비 절약: ~$3,000/월.",
+      tr: "💰 AI asistan hizmetimiz:\n\n• Kurulum: $99 (tek seferlik)\n• Aylık: $79/ay\n• Dahil: çok dilli destek, güncellemeler, eğitim\n\nYarı zamanlı çalışana karşı tasarruf: ~$3,000/ay."
+    }
+  },
+  contact: {
+    keys: {
+      en: /\b(contact|reach|call|phone|email|talk to|speak)\b/i,
+      fr: /\b(contact|joindre|appeler|téléphone|courriel|parler)\b/i,
+      ar: /(تواصل|اتصال|هاتف|بريد|تحدث)/,
+      es: /\b(contact|llam|teléfono|correo|hablar)\b/i,
+      de: /\b(kontakt|anruf|telefon|email|sprechen)\b/i,
+      pt: /\b(contato|liga|telefone|email|falar)\b/i,
+      it: /\b(contatt|chiamar|telefono|email|parlare)\b/i,
+      ru: /\b(контакт|звон|телефон|почт|связ)\b/i,
+      zh: /(联系|电话|邮件|联络)/,
+      ja: /(連絡|電話|メール|問い合わせ)/,
+      ko: /(연락|전화|이메일|문의)/,
+      tr: /\b(iletişim|ara|telefon|email|konuş)\b/i
+    },
+    replies: {
+      en: "📞 Get in touch:\n\n• Email: your@email.com\n• Phone: (514) 555-0100\n• Reply within 2 hours\n\nThe assistant automatically forwards complex requests to you.",
+      fr: "📞 Pour me joindre:\n\n• Email: votre@email.com\n• Téléphone: (514) 555-0100\n• Réponse en moins de 2 heures\n\nL'assistant transfère automatiquement les demandes complexes.",
+      ar: "📞 للتواصل معنا:\n\n• البريد الإلكتروني: your@email.com\n• الهاتف: (514) 555-0100\n• الرد خلال ساعتين\n\nيقوم المساعد تلقائيًا بإحالة الطلبات المعقدة إليك.",
+      es: "📞 Contáctanos:\n\n• Email: tu@email.com\n• Teléfono: (514) 555-0100\n• Respuesta en menos de 2 horas\n\nEl asistente reenvía automáticamente las solicitudes complejas.",
+      de: "📞 Kontakt:\n\n• E-Mail: ihre@email.com\n• Telefon: (514) 555-0100\n• Antwort innerhalb von 2 Stunden\n\nDer Assistent leitet komplexe Anfragen automatisch an Sie weiter.",
+      pt: "📞 Entre em contato:\n\n• Email: seu@email.com\n• Telefone: (514) 555-0100\n• Resposta em menos de 2 horas\n\nO assistente encaminha automaticamente solicitações complexas.",
+      it: "📞 Contattaci:\n\n• Email: tuo@email.com\n• Telefono: (514) 555-0100\n• Risposta entro 2 ore\n\nL'assistente inoltra automaticamente le richieste complesse.",
+      ru: "📞 Свяжитесь с нами:\n\n• Email: ваш@email.com\n• Телефон: (514) 555-0100\n• Ответ в течение 2 часов\n\nПомощник автоматически пересылает сложные запросы.",
+      zh: "📞 联系我们：\n\n• 邮箱: your@email.com\n• 电话: (514) 555-0100\n• 2小时内回复\n\n助手会自动转发复杂请求给您。",
+      ja: "📞 お問い合わせ：\n\n• メール: your@email.com\n• 電話: (514) 555-0100\n• 2時間以内に返信\n\nアシスタントは複雑なリクエストを自動的に転送します。",
+      ko: "📞 연락처:\n\n• 이메일: your@email.com\n• 전화: (514) 555-0100\n• 2시간 이내 응답\n\n어시스턴트가 복잡한 요청을 자동으로 전달합니다.",
+      tr: "📞 Bize ulaşın:\n\n• E-posta: your@email.com\n• Telefon: (514) 555-0100\n• 2 saat içinde yanıt\n\nAsistan karmaşık istekleri otomatik olarak iletir."
+    }
+  },
+  how: {
+    keys: {
+      en: /\b(how|work|install|website|setup|implement|integrate)\b/i,
+      fr: /\b(comment|fonctionne|marche|installer|site|intégr)\b/i,
+      ar: /(كيف|يعمل|تثبيت|موقع|دمج)/,
+      es: /\b(cómo|funcion|instal|sitio|integr)\b/i,
+      de: /\b(wie|funktion|install|website|integrier)\b/i,
+      pt: /\b(como|funcion|instal|site|integr)\b/i,
+      it: /\b(come|funzion|install|sito|integr)\b/i,
+      ru: /\b(как|работ|установ|сайт|интегр)\b/i,
+      zh: /(如何|怎么|工作|安装|网站|集成)/,
+      ja: /(どう|どのよう|機能|インストール|ウェブサイト|統合)/,
+      ko: /(어떻게|작동|설치|웹사이트|통합)/,
+      tr: /\b(nasıl|çalış|kur|site|entegr)\b/i
+    },
+    replies: {
+      en: "✨ It's simple:\n\n1️⃣ You tell me: services, prices, FAQ\n2️⃣ I build your assistant in 24h\n3️⃣ You add 1 line of code to your site\n4️⃣ Your customers get instant answers\n\nNo technical skills required!",
+      fr: "✨ Très simple:\n\n1️⃣ Vous me dites: services, prix, FAQ\n2️⃣ Je crée votre assistant en 24h\n3️⃣ Vous ajoutez 1 ligne de code à votre site\n4️⃣ Vos clients ont des réponses instantanées\n\nAucune compétence technique requise!",
+      ar: "✨ الأمر بسيط:\n\n1️⃣ أخبرني بـ: الخدمات، الأسعار، الأسئلة الشائعة\n2️⃣ أبني مساعدك خلال 24 ساعة\n3️⃣ تضيف سطر كود واحد إلى موقعك\n4️⃣ عملاؤك يحصلون على إجابات فورية\n\nلا حاجة لمهارات تقنية!",
+      es: "✨ Es simple:\n\n1️⃣ Me dices: servicios, precios, FAQ\n2️⃣ Construyo tu asistente en 24h\n3️⃣ Agregas 1 línea de código a tu sitio\n4️⃣ Tus clientes obtienen respuestas instantáneas\n\n¡No se requieren habilidades técnicas!",
+      de: "✨ Es ist einfach:\n\n1️⃣ Sie nennen mir: Dienstleistungen, Preise, FAQ\n2️⃣ Ich baue Ihren Assistenten in 24h\n3️⃣ Sie fügen 1 Codezeile zu Ihrer Website hinzu\n4️⃣ Ihre Kunden erhalten sofortige Antworten\n\nKeine technischen Fähigkeiten erforderlich!",
+      pt: "✨ É simples:\n\n1️⃣ Você me diz: serviços, preços, FAQ\n2️⃣ Construo seu assistente em 24h\n3️⃣ Você adiciona 1 linha de código ao seu site\n4️⃣ Seus clientes recebem respostas instantâneas\n\nNão são necessárias habilidades técnicas!",
+      it: "✨ È semplice:\n\n1️⃣ Mi dici: servizi, prezzi, FAQ\n2️⃣ Costruisco il tuo assistente in 24h\n3️⃣ Aggiungi 1 riga di codice al tuo sito\n4️⃣ I tuoi clienti ricevono risposte istantanee\n\nNessuna competenza tecnica richiesta!",
+      ru: "✨ Это просто:\n\n1️⃣ Вы говорите мне: услуги, цены, FAQ\n2️⃣ Я создаю вашего помощника за 24 часа\n3️⃣ Вы добавляете 1 строку кода на свой сайт\n4️⃣ Ваши клиенты получают мгновенные ответы\n\nТехнические навыки не требуются!",
+      zh: "✨ 很简单：\n\n1️⃣ 您告诉我：服务、价格、常见问题\n2️⃣ 我在24小时内构建您的助手\n3️⃣ 您将1行代码添加到您的网站\n4️⃣ 您的客户获得即时答复\n\n无需技术技能！",
+      ja: "✨ 簡単です：\n\n1️⃣ 教えてください：サービス、価格、FAQ\n2️⃣ 24時間でアシスタントを構築します\n3️⃣ サイトに1行のコードを追加\n4️⃣ お客様は即座に回答を取得\n\n技術スキルは不要です！",
+      ko: "✨ 간단합니다:\n\n1️⃣ 알려주세요: 서비스, 가격, FAQ\n2️⃣ 24시간 안에 어시스턴트 구축\n3️⃣ 사이트에 코드 1줄 추가\n4️⃣ 고객이 즉시 답변 받음\n\n기술 지식 불필요!",
+      tr: "✨ Basit:\n\n1️⃣ Bana söyleyin: hizmetler, fiyatlar, SSS\n2️⃣ Asistanınızı 24 saatte kurarım\n3️⃣ Sitenize 1 satır kod ekleyin\n4️⃣ Müşterileriniz anında yanıt alır\n\nTeknik beceri gerekmez!"
+    }
+  },
+  greeting: {
+    keys: {
+      en: /\b(hello|hi|hey|good morning|good afternoon|good evening|howdy)\b/i,
+      fr: /\b(bonjour|salut|allô|coucou|bonsoir|hey)\b/i,
+      ar: /(مرحبا|أهلا|سلام|صباح|مساء)/,
+      es: /\b(hola|buenos días|buenas tardes|buenas noches|saludos)\b/i,
+      de: /\b(hallo|guten tag|guten morgen|guten abend|hi|hey)\b/i,
+      pt: /\b(olá|oi|bom dia|boa tarde|boa noite|salve)\b/i,
+      it: /\b(ciao|buongiorno|buonasera|salve)\b/i,
+      ru: /\b(привет|здравствуй|добр|здорово)\b/i,
+      zh: /(你好|您好|早上好|下午好|晚上好|嗨)/,
+      ja: /(こんにちは|こんばんは|おはよう|やあ|もしもし)/,
+      ko: /(안녕|안녕하세요|반갑|좋은)/,
+      tr: /\b(merhaba|selam|günaydın|iyi akşamlar)\b/i
+    },
+    replies: {
+      en: "Hello! 😊 I'm the AI demo assistant. Ask me anything — services, pricing, location, how it works. I'm here to show you what I can do for your business!",
+      fr: "Bonjour! 😊 Je suis l'assistant IA démo. Posez-moi n'importe quelle question — services, prix, localisation, fonctionnement. Je suis là pour vous montrer ce que je peux faire!",
+      ar: "مرحبًا! 😊 أنا مساعد الذكاء الاصطناعي التجريبي. اسألني أي شيء — الخدمات، الأسعار، الموقع، كيفية العمل. أنا هنا لأريك ما يمكنني فعله!",
+      es: "¡Hola! 😊 Soy el asistente IA demo. Pregúntame lo que sea — servicios, precios, ubicación, cómo funciona. ¡Estoy aquí para mostrarte lo que puedo hacer!",
+      de: "Hallo! 😊 Ich bin der KI-Demo-Assistent. Fragen Sie mich alles — Dienstleistungen, Preise, Standort, Funktionsweise. Ich bin hier, um Ihnen zu zeigen, was ich kann!",
+      pt: "Olá! 😊 Sou o assistente IA demo. Pergunte qualquer coisa — serviços, preços, localização, como funciona. Estou aqui para mostrar o que posso fazer!",
+      it: "Ciao! 😊 Sono l'assistente IA demo. Chiedimi qualsiasi cosa — servizi, prezzi, posizione, come funziona. Sono qui per mostrarti cosa posso fare!",
+      ru: "Привет! 😊 Я демо AI-помощник. Спросите меня что угодно — услуги, цены, местоположение, как это работает. Я здесь, чтобы показать, что я могу!",
+      zh: "你好！😊 我是AI演示助手。问我任何问题 — 服务、价格、位置、如何运作。我在这里向您展示我能做什么！",
+      ja: "こんにちは！😊 AIデモアシスタントです。何でも聞いてください — サービス、価格、場所、仕組み。私が何ができるかお見せします！",
+      ko: "안녕하세요! 😊 AI 데모 어시스턴트입니다. 무엇이든 물어보세요 — 서비스, 가격, 위치, 작동 방식. 제가 무엇을 할 수 있는지 보여드리겠습니다!",
+      tr: "Merhaba! 😊 Ben AI demo asistanıyım. Bana herhangi bir şey sorun — hizmetler, fiyatlar, konum, nasıl çalıştığı. Size neler yapabileceğimi göstermek için buradayım!"
+    }
+  },
+  thanks: {
+    keys: {
+      en: /\b(thank|thanks|appreciate|grateful)\b/i,
+      fr: /\b(merci|remerc)\b/i,
+      ar: /(شكر|ممتن|أقدر)/,
+      es: /\b(gracias|agradez)\b/i,
+      de: /\b(danke|vielen dank|dankeschön)\b/i,
+      pt: /\b(obrigad|grato)\b/i,
+      it: /\b(grazie|ringraz)\b/i,
+      ru: /\b(спасибо|благодар)\b/i,
+      zh: /(谢谢|感谢|多谢)/,
+      ja: /(ありがと|感謝|どうも)/,
+      ko: /(감사|고마)/,
+      tr: /\b(teşekkür|sağol|sağ ol)\b/i
+    },
+    replies: {
+      en: "You're welcome! 🙏 If you have more questions or want to discuss an assistant for your business, just ask.",
+      fr: "Avec plaisir! 🙏 Si vous avez d'autres questions ou voulez discuter d'un assistant pour votre entreprise, n'hésitez pas.",
+      ar: "العفو! 🙏 إذا كان لديك المزيد من الأسئلة أو تريد مناقشة مساعد لعملك، اسأل فقط.",
+      es: "¡De nada! 🙏 Si tienes más preguntas o quieres hablar de un asistente para tu negocio, solo pregunta.",
+      de: "Gern geschehen! 🙏 Wenn Sie weitere Fragen haben oder einen Assistenten für Ihr Unternehmen besprechen möchten, fragen Sie einfach.",
+      pt: "De nada! 🙏 Se tiver mais perguntas ou quiser discutir um assistente para seu negócio, basta perguntar.",
+      it: "Prego! 🙏 Se hai altre domande o vuoi discutere di un assistente per la tua attività, chiedi pure.",
+      ru: "Пожалуйста! 🙏 Если у вас есть еще вопросы или вы хотите обсудить помощника для вашего бизнеса, просто спросите.",
+      zh: "不客气！🙏 如果您有更多问题或想讨论为您的业务设置助手，请随时提问。",
+      ja: "どういたしまして！🙏 他にご質問があるか、ビジネスのためのアシスタントについてご相談したい場合は、お気軽にお尋ねください。",
+      ko: "천만에요! 🙏 더 궁금한 점이 있거나 비즈니스용 어시스턴트에 대해 논의하고 싶으시면 언제든 물어보세요.",
+      tr: "Rica ederim! 🙏 Daha fazla sorunuz varsa veya işletmeniz için bir asistan tartışmak isterseniz, sadece sorun."
+    }
+  }
+};
 
-let detectedLang = null;
-let confirmed = false;
-
+// ============================================================
+// LANGUAGE DETECTION — script-based + word-based
+// ============================================================
 function detectLang(text) {
-  const frScore = (text.match(frWords) || []).length;
-  const enScore = (text.match(enWords) || []).length;
-  if (frScore === 0 && enScore === 0) return detectedLang || 'fr';
-  return frScore >= enScore ? 'fr' : 'en';
+  if (!text || !text.trim()) return null;
+
+  // SCRIPT detection (most reliable for non-Latin)
+  if (/[\u0600-\u06FF]/.test(text)) return 'ar';      // Arabic
+  if (/[\u4E00-\u9FFF]/.test(text)) return 'zh';      // Chinese (CJK)
+  if (/[\u3040-\u309F\u30A0-\u30FF]/.test(text)) return 'ja';  // Japanese hiragana/katakana
+  if (/[\uAC00-\uD7AF]/.test(text)) return 'ko';      // Korean
+  if (/[\u0400-\u04FF]/.test(text)) return 'ru';      // Cyrillic
+
+  // LATIN-script word detection
+  const patterns = {
+    fr: /\b(bonjour|salut|merci|oui|non|allô|coucou|je|nous|vous|tu|est|sont|les|des|une|un|comment|pourquoi|quand|où|qui|quoi|combien|votre|notre|mon|ton|son|c'est|qu'est|qu'il|s'il|d'une|jusqu|avec|pour|dans|sur|aussi|très|bien|peux|veux|aimerais|cherche|besoin|fait|faire|avoir|être)\b/gi,
+    en: /\b(hello|hi|hey|thanks|thank|yes|no|please|sorry|i|we|you|is|are|the|a|an|how|why|when|where|who|what|which|much|your|our|my|i'm|we're|you're|it's|don't|can't|won't|with|for|in|on|also|very|good|want|like|need|have|been|will|would|could|should)\b/gi,
+    es: /\b(hola|gracias|sí|no|por favor|cómo|qué|cuándo|dónde|quién|cuánto|tu|tu|nuestro|nuestra|mi|usted|nosotros|ellos|el|la|los|las|un|una|y|o|pero|con|para|en|sobre|también|muy|bien|quiero|puedo|necesito|tengo|estoy|está|son|fue|será)\b/gi,
+    de: /\b(hallo|danke|ja|nein|bitte|wie|warum|wann|wo|wer|was|welche|viel|ihr|unser|mein|sie|wir|er|der|die|das|ein|eine|und|oder|aber|mit|für|in|auf|auch|sehr|gut|will|kann|muss|habe|bin|ist|sind|war|wird)\b/gi,
+    pt: /\b(olá|oi|obrigado|obrigada|sim|não|por favor|como|por que|quando|onde|quem|quanto|seu|sua|nosso|nossa|meu|você|nós|eles|o|a|os|as|um|uma|e|ou|mas|com|para|em|sobre|também|muito|bem|quero|posso|preciso|tenho|estou|está|são|foi|será)\b/gi,
+    it: /\b(ciao|grazie|sì|no|prego|come|perché|quando|dove|chi|cosa|quale|quanto|tuo|nostro|mio|lei|noi|loro|il|la|i|le|un|una|e|o|ma|con|per|in|su|anche|molto|bene|voglio|posso|devo|ho|sono|è|era|sarà)\b/gi,
+    tr: /\b(merhaba|selam|teşekkür|evet|hayır|lütfen|nasıl|neden|ne zaman|nerede|kim|ne|hangi|kaç|sizin|bizim|benim|sen|biz|onlar|bir|ve|ya da|ama|ile|için|içinde|üzerinde|de|çok|iyi|istiyorum|yapabilir|gerek|var|olmak)\b/gi
+  };
+
+  // Specific accent/character clues
+  const accentClues = {
+    fr: /[çàâæéèêëîïôœùûüÿ]/i,
+    es: /[ñ¿¡áéíóúü]/i,
+    de: /[äöüß]/i,
+    pt: /[ãõçáàâéêíóôú]/i,
+    it: /[àèéìòù]/i,
+    tr: /[çğıİöşü]/i
+  };
+
+  const scores = {};
+  for (const [lang, pattern] of Object.entries(patterns)) {
+    const matches = text.match(pattern) || [];
+    scores[lang] = matches.length;
+  }
+
+  // Add weight for unique accent characters
+  for (const [lang, accentPattern] of Object.entries(accentClues)) {
+    if (accentPattern.test(text)) scores[lang] = (scores[lang] || 0) + 1.5;
+  }
+
+  // Find max
+  let maxLang = null;
+  let maxScore = 0;
+  for (const [lang, score] of Object.entries(scores)) {
+    if (score > maxScore) {
+      maxScore = score;
+      maxLang = lang;
+    }
+  }
+
+  return maxScore > 0 ? maxLang : null;
 }
 
-function setLangLabel(lang) {
-  document.getElementById('lang-label').textContent = lang === 'fr' ? 'Français détecté' : 'English detected';
+// ============================================================
+// STATE
+// ============================================================
+let currentLang = 'en';
+let isThinking = false;
+
+// ============================================================
+// UI
+// ============================================================
+function setLang(lang) {
+  if (!KB[lang]) return;
+  currentLang = lang;
+  const k = KB[lang];
+  document.getElementById('lang-badge').textContent = lang.toUpperCase();
+  document.getElementById('userInput').placeholder = k.placeholder;
+  document.getElementById('status-text').textContent = k.status;
+
+  // RTL support for Arabic
+  const input = document.getElementById('userInput');
+  if (k.rtl) {
+    input.style.direction = 'rtl';
+    input.style.textAlign = 'right';
+  } else {
+    input.style.direction = 'ltr';
+    input.style.textAlign = 'left';
+  }
 }
 
-function addMsg(text, role, isTyping = false) {
+function addMsg(text, role, lang) {
   const msgs = document.getElementById('msgs');
   const d = document.createElement('div');
-  if (isTyping) {
-    d.className = 'msg bot typing-indicator';
-    d.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-    d.id = 'typing';
-  } else {
-    d.className = 'msg ' + role;
-    d.style.whiteSpace = 'pre-line';
-    d.textContent = text;
-  }
+  d.className = 'msg ' + role;
+  if (lang && KB[lang] && KB[lang].rtl) d.classList.add('rtl');
+  d.textContent = text;
   msgs.appendChild(d);
   msgs.scrollTop = msgs.scrollHeight;
-  return d;
 }
 
-function removeTyping() {
+function showTyping() {
+  const msgs = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'typing-indicator';
+  d.id = 'typing';
+  d.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideTyping() {
   const t = document.getElementById('typing');
   if (t) t.remove();
 }
 
-function renderPills(lang) {
+function renderPills() {
   const pills = document.getElementById('pills');
   pills.innerHTML = '';
-  KB[lang].pills.forEach(p => {
+  const label = document.createElement('div');
+  label.className = 'pills-label';
+  const labels = {
+    en: 'Suggestions', fr: 'Suggestions', ar: 'اقتراحات', es: 'Sugerencias',
+    de: 'Vorschläge', pt: 'Sugestões', it: 'Suggerimenti', ru: 'Предложения',
+    zh: '建议', ja: '提案', ko: '제안', tr: 'Öneriler'
+  };
+  label.textContent = labels[currentLang] || 'Suggestions';
+  pills.appendChild(label);
+  (KB[currentLang].pills || KB.en.pills).forEach(p => {
     const b = document.createElement('button');
     b.className = 'pill';
     b.textContent = p;
-    b.onclick = () => handleInput(p, true);
+    b.onclick = () => process(p, true);
     pills.appendChild(b);
   });
 }
 
-function getAnswer(text, lang) {
-  const low = text.toLowerCase();
-  const answers = KB[lang].answers;
-  for (const pattern in answers) {
-    const regex = new RegExp(pattern, 'i');
-    if (regex.test(low)) return answers[pattern];
-  }
-  return KB[lang].fallback;
+function clearPills() {
+  document.getElementById('pills').innerHTML = '';
 }
 
-function handleInput(text, isPill = false) {
+// ============================================================
+// ANSWER LOOKUP
+// ============================================================
+function findAnswer(text, lang) {
+  let best = null;
+  let bestScore = 0;
+
+  for (const [topic, data] of Object.entries(ANSWERS)) {
+    // Test all language patterns to be flexible
+    let score = 0;
+    for (const [langKey, pattern] of Object.entries(data.keys)) {
+      if (pattern.test(text)) score++;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = data.replies[lang] || data.replies.en;
+    }
+  }
+
+  return best || (KB[lang] ? KB[lang].fallback : KB.en.fallback);
+}
+
+// ============================================================
+// MAIN HANDLER
+// ============================================================
+function process(text, isPill = false) {
+  if (isThinking) return;
+
   if (!isPill) {
     const inp = document.getElementById('userInput');
     text = inp.value.trim();
@@ -370,36 +1025,40 @@ function handleInput(text, isPill = false) {
     inp.value = '';
   }
 
-  const lang = detectLang(text);
-  if (lang !== detectedLang) {
-    detectedLang = lang;
-    setLangLabel(lang);
-    document.getElementById('userInput').placeholder = KB[lang].placeholder;
-    renderPills(lang);
-  }
+  // Detect language
+  const detected = detectLang(text);
+  if (detected && detected !== currentLang) setLang(detected);
 
-  addMsg(text, 'user');
-  document.getElementById('pills').innerHTML = '';
-  addMsg('', 'bot', true);
+  addMsg(text, 'user', currentLang);
+  clearPills();
+  isThinking = true;
+  document.getElementById('sendBtn').disabled = true;
 
+  showTyping();
+
+  const delay = 600 + Math.random() * 700;
   setTimeout(() => {
-    removeTyping();
-    const answer = getAnswer(text, detectedLang || 'fr');
-    addMsg(answer, 'bot');
-    renderPills(detectedLang || 'fr');
-  }, 700 + Math.random() * 400);
+    hideTyping();
+    const answer = findAnswer(text, currentLang);
+    addMsg(answer, 'bot', currentLang);
+    renderPills();
+    isThinking = false;
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('userInput').focus();
+  }, delay);
 }
 
-function send() { handleInput('', false); }
+function send() { process('', false); }
 
-// Init — detect browser lang
+// ============================================================
+// INIT
+// ============================================================
 function init() {
-  const browserLang = navigator.language || navigator.userLanguage || 'fr';
-  detectedLang = browserLang.startsWith('fr') ? 'fr' : 'en';
-  setLangLabel(detectedLang);
-  document.getElementById('userInput').placeholder = KB[detectedLang].placeholder;
-  addMsg(KB[detectedLang].welcome, 'bot');
-  renderPills(detectedLang);
+  const browserLang = (navigator.language || 'en').toLowerCase().split('-')[0];
+  const startLang = KB[browserLang] ? browserLang : 'en';
+  setLang(startLang);
+  addMsg(KB[startLang].welcome, 'bot', startLang);
+  renderPills();
 }
 
 init();
