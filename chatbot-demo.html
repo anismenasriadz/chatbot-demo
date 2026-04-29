@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistant IA — Clinique Dentaire St-Laurent</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Fraunces:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --dark: #0e0e14;
+    --dark2: #16161f;
+    --dark3: #1e1e2a;
+    --accent: #4ade80;
+    --accent2: #22c55e;
+    --text: #f0f0f0;
+    --muted: #8888a0;
+    --border: rgba(255,255,255,0.07);
+    --bubble-bot: #1e1e2a;
+    --bubble-user: #166534;
+    --radius: 16px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .page-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(74,222,128,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 480px;
+  }
+
+  .branding {
+    text-align: center;
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .branding h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+
+  .branding p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .lang-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 8px;
+  }
+
+  .lang-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+
+  .chat-card {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .chat-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--dark3);
+  }
+
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #166534, #4ade80);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 500; color: #fff; flex-shrink: 0;
+  }
+
+  .header-info { flex: 1; }
+  .header-name { font-size: 14px; font-weight: 500; }
+  .header-status { font-size: 11px; color: var(--accent); display: flex; align-items: center; gap: 5px; margin-top: 1px; }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .chat-messages {
+    height: 360px;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--dark3) transparent;
+  }
+
+  .msg {
+    max-width: 84%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    animation: msgIn 0.2s ease both;
+  }
+
+  .msg.bot {
+    background: var(--bubble-bot);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    color: var(--text);
+  }
+
+  .msg.user {
+    background: var(--bubble-user);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    color: #dcfce7;
+  }
+
+  .msg.typing-indicator {
+    display: flex; gap: 4px; align-items: center;
+    padding: 12px 16px;
+  }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  .pills-wrap {
+    padding: 10px 14px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+    border-top: 1px solid var(--border);
+    min-height: 52px;
+    align-items: flex-start;
+  }
+
+  .pill {
+    font-size: 11.5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .pill:hover { background: rgba(74,222,128,0.1); border-color: var(--accent); color: var(--accent); }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px 14px;
+  }
+
+  .input-row input {
+    flex: 1;
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .input-row input:focus { border-color: rgba(74,222,128,0.4); }
+  .input-row input::placeholder { color: var(--muted); }
+
+  .send-btn {
+    background: var(--accent2);
+    border: none;
+    border-radius: 10px;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .send-btn:hover { background: var(--accent); }
+  .send-btn:active { transform: scale(0.95); }
+
+  .send-btn svg { width: 16px; height: 16px; fill: #fff; }
+
+  .footer-note {
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 14px;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .footer-note a { color: var(--accent); text-decoration: none; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body>
+
+<div class="page-bg"></div>
+
+<div class="container">
+  <div class="branding">
+    <h1>Clinique Dentaire St-Laurent</h1>
+    <p>Assistant virtuel · Virtual assistant</p>
+    <div class="lang-pill">
+      <div class="lang-dot"></div>
+      <span id="lang-label">Détection de la langue...</span>
+    </div>
+  </div>
+
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="avatar">CS</div>
+      <div class="header-info">
+        <div class="header-name">Assistant IA</div>
+        <div class="header-status"><div class="status-dot"></div><span id="status-text">En ligne · Online</span></div>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="msgs"></div>
+
+    <div class="pills-wrap" id="pills"></div>
+
+    <div class="input-row">
+      <input type="text" id="userInput" placeholder="Écrivez un message / Type a message..." onkeydown="if(event.key==='Enter')send()" />
+      <button class="send-btn" onclick="send()">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Propulsé par IA · Powered by AI
+  </div>
+</div>
+
+<script>
+const KB = {
+  fr: {
+    welcome: "Bonjour! Je suis l'assistant virtuel de la Clinique Dentaire St-Laurent. Comment puis-je vous aider aujourd'hui?",
+    pills: ["Heures d'ouverture", "Prendre rendez-vous", "Urgence dentaire", "Assurances acceptées", "Nos services", "Localisation"],
+    answers: {
+      "heure|ouvert|horaire|fermé|weekend|samedi|dimanche": "Nous sommes ouverts:\n🗓 Lundi–Vendredi: 8h00–18h00\n🗓 Samedi: 9h00–14h00\n❌ Dimanche: Fermé",
+      "rendez|appoint|réserv|booking|book": "Pour prendre un rendez-vous:\n📞 (514) 555-0187\nLes nouveaux patients sont les bienvenus!",
+      "urgence|urgent|douleur|mal|cassé|brisé": "🚨 Urgence dentaire? Appelez immédiatement:\n📞 (514) 555-0187\nNous avons des plages réservées chaque jour pour les urgences.",
+      "assurance|insurance|couverture|régime": "Nous acceptons:\n✅ Sun Life\n✅ Great-West\n✅ Desjardins\n✅ Croix Bleue / Blue Cross\nContactez-nous pour confirmer votre couverture.",
+      "service|traitement|soin|blanchiment|implant|ortho|nettoyage": "Nos services incluent:\n• Examen et nettoyage\n• Blanchiment dentaire\n• Implants dentaires\n• Orthodontie\n• Soins d'urgence\nAppellez-nous pour plus d'info!",
+      "adresse|localisation|où|situé|trouver|stationnement": "📍 1234 Boulevard St-Laurent\nMontréal, QC H2X 2S9\n🚇 Métro Saint-Laurent (ligne verte)\n🅿️ Stationnement disponible",
+    },
+    fallback: "Merci pour votre question! Pour une réponse personnalisée, contactez-nous:\n📞 (514) 555-0187",
+    placeholder: "Écrivez votre message..."
+  },
+  en: {
+    welcome: "Hello! I'm the virtual assistant for Clinique Dentaire St-Laurent. How can I help you today?",
+    pills: ["Opening hours", "Book appointment", "Dental emergency", "Accepted insurance", "Our services", "Location"],
+    answers: {
+      "hour|open|schedule|closed|weekend|saturday|sunday": "We are open:\n🗓 Monday–Friday: 8:00am–6:00pm\n🗓 Saturday: 9:00am–2:00pm\n❌ Sunday: Closed",
+      "appoint|book|reserv|schedul": "To book an appointment:\n📞 (514) 555-0187\nNew patients are always welcome!",
+      "emerg|urgent|pain|broke|crack|toothache": "🚨 Dental emergency? Call immediately:\n📞 (514) 555-0187\nWe reserve daily slots for urgent cases.",
+      "insur|coverage|plan|benefit": "We accept:\n✅ Sun Life\n✅ Great-West\n✅ Desjardins\n✅ Blue Cross / Croix Bleue\nContact us to confirm your coverage.",
+      "service|treatment|care|whitening|implant|ortho|cleaning|braces": "Our services include:\n• Exam & Cleaning\n• Teeth Whitening\n• Dental Implants\n• Orthodontics\n• Emergency Care\nCall us for more info!",
+      "address|location|where|find|parking|direction": "📍 1234 Boulevard St-Laurent\nMontréal, QC H2X 2S9\n🚇 Metro Saint-Laurent (green line)\n🅿️ Parking available",
+    },
+    fallback: "Thanks for your question! For a personalized answer, contact us:\n📞 (514) 555-0187",
+    placeholder: "Type your message..."
+  }
+};
+
+const frWords = /\b(bonjour|salut|merci|oui|non|je|nous|vous|est|les|des|une|comment|pourquoi|quand|heures|rendez|urgence|dentaire|assurance|service|localisation|ouvert|fermé|prix|coût|traitement|soins|douleur|besoin|avoir|faire|vouloir|pouvez)\b/i;
+const enWords = /\b(hello|hi|thanks|yes|no|i|we|you|is|the|a|an|how|why|when|hours|appointment|emergency|dental|insurance|service|location|open|closed|price|cost|treatment|care|pain|need|can|you|please|help)\b/i;
+
+let detectedLang = null;
+let confirmed = false;
+
+function detectLang(text) {
+  const frScore = (text.match(frWords) || []).length;
+  const enScore = (text.match(enWords) || []).length;
+  if (frScore === 0 && enScore === 0) return detectedLang || 'fr';
+  return frScore >= enScore ? 'fr' : 'en';
+}
+
+function setLangLabel(lang) {
+  document.getElementById('lang-label').textContent = lang === 'fr' ? 'Français détecté' : 'English detected';
+}
+
+function addMsg(text, role, isTyping = false) {
+  const msgs = document.getElementById('msgs');
+  const d = document.createElement('div');
+  if (isTyping) {
+    d.className = 'msg bot typing-indicator';
+    d.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+    d.id = 'typing';
+  } else {
+    d.className = 'msg ' + role;
+    d.style.whiteSpace = 'pre-line';
+    d.textContent = text;
+  }
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  return d;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function renderPills(lang) {
+  const pills = document.getElementById('pills');
+  pills.innerHTML = '';
+  KB[lang].pills.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'pill';
+    b.textContent = p;
+    b.onclick = () => handleInput(p, true);
+    pills.appendChild(b);
+  });
+}
+
+function getAnswer(text, lang) {
+  const low = text.toLowerCase();
+  const answers = KB[lang].answers;
+  for (const pattern in answers) {
+    const regex = new RegExp(pattern, 'i');
+    if (regex.test(low)) return answers[pattern];
+  }
+  return KB[lang].fallback;
+}
+
+function handleInput(text, isPill = false) {
+  if (!isPill) {
+    const inp = document.getElementById('userInput');
+    text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+  }
+
+  const lang = detectLang(text);
+  if (lang !== detectedLang) {
+    detectedLang = lang;
+    setLangLabel(lang);
+    document.getElementById('userInput').placeholder = KB[lang].placeholder;
+    renderPills(lang);
+  }
+
+  addMsg(text, 'user');
+  document.getElementById('pills').innerHTML = '';
+  addMsg('', 'bot', true);
+
+  setTimeout(() => {
+    removeTyping();
+    const answer = getAnswer(text, detectedLang || 'fr');
+    addMsg(answer, 'bot');
+    renderPills(detectedLang || 'fr');
+  }, 700 + Math.random() * 400);
+}
+
+function send() { handleInput('', false); }
+
+// Init — detect browser lang
+function init() {
+  const browserLang = navigator.language || navigator.userLanguage || 'fr';
+  detectedLang = browserLang.startsWith('fr') ? 'fr' : 'en';
+  setLangLabel(detectedLang);
+  document.getElementById('userInput').placeholder = KB[detectedLang].placeholder;
+  addMsg(KB[detectedLang].welcome, 'bot');
+  renderPills(detectedLang);
+}
+
+init();
+</script>
+</body>
+</html>
