@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Onboarding — AI Chatbot Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #fafaf9;
+    --bg2: #ffffff;
+    --bg3: #f5f5f4;
+    --text: #1a1a1a;
+    --text-dim: #525252;
+    --text-muted: #a3a3a3;
+    --accent: #166534;
+    --accent-light: #4ade80;
+    --accent-bg: #f0fdf4;
+    --border: #e5e5e5;
+    --border-bright: #d4d4d4;
+    --danger: #dc2626;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    background: var(--accent-bg);
+    border: 1px solid #bbf7d0;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.3px;
+  }
+
+  .logo-mark::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    box-shadow: 0 0 8px var(--accent-light);
+  }
+
+  .header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 600;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+
+  .header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header p {
+    color: var(--text-dim);
+    font-size: 16px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* Progress */
+  .progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 32px 0;
+  }
+
+  .progress-step {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    transition: background 0.3s;
+  }
+
+  .progress-step.active { background: var(--accent); }
+  .progress-step.complete { background: var(--accent-light); }
+
+  /* Section card */
+  .section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 10px;
+    font-family: 'Fraunces', serif;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .section h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .section-desc {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    margin-bottom: 20px;
+    margin-left: 38px;
+  }
+
+  /* Fields */
+  .field { margin-bottom: 16px; }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .required { color: var(--danger); }
+
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border-bright);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1);
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+
+  /* Checkbox group */
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .check-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg2);
+    border: 1px solid var(--border-bright);
+    padding: 8px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .check-pill input { display: none; }
+  .check-pill:hover { border-color: var(--accent); }
+  .check-pill.checked {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .check-pill.checked::before {
+    content: '✓';
+    font-weight: 600;
+  }
+
+  /* FAQ items */
+  .faq-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .faq-num {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: white;
+    color: var(--text-muted);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+  }
+
+  .faq-actions { margin-top: 8px; }
+
+  /* Buttons */
+  .btn {
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    border: 1px solid var(--border-bright);
+    background: var(--bg2);
+    color: var(--text);
+  }
+
+  .btn:hover { background: var(--bg3); border-color: var(--text-muted); }
+  .btn:active { transform: translateY(1px); }
+
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .btn.primary:hover { background: #14532d; border-color: #14532d; }
+
+  .btn.large {
+    padding: 14px 28px;
+    font-size: 15px;
+    width: 100%;
+  }
+
+  .btn.danger {
+    background: transparent;
+    border-color: transparent;
+    color: var(--danger);
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .btn.danger:hover { background: rgba(220,38,38,0.08); }
+
+  .btn.add {
+    width: 100%;
+    background: transparent;
+    border: 1.5px dashed var(--border-bright);
+    color: var(--text-dim);
+  }
+  .btn.add:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+  /* Submit area */
+  .submit-area {
+    margin-top: 32px;
+    padding: 24px;
+    background: var(--accent-bg);
+    border: 1px solid #bbf7d0;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .submit-area h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--accent);
+  }
+
+  .submit-area p {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  /* Success state */
+  .success-screen {
+    background: var(--bg2);
+    border: 1px solid #bbf7d0;
+    border-radius: 16px;
+    padding: 48px 32px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .success-screen .icon {
+    width: 64px;
+    height: 64px;
+    background: var(--accent-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .success-screen h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .success-screen p {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .summary-box {
+    text-align: left;
+    background: var(--bg3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* Footer */
+  .footer-note {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="logo-mark">Onboarding · 5 minutes</div>
+    <h1>Let's set up your <em>AI Assistant</em></h1>
+    <p>Fill this out and I'll have your chatbot ready in 24 hours. No technical skills needed — just answer the questions below.</p>
+  </header>
+
+  <div class="progress">
+    <div class="progress-step active"></div>
+    <div class="progress-step active"></div>
+    <div class="progress-step active"></div>
+    <div class="progress-step active"></div>
+    <div class="progress-step active"></div>
+  </div>
+
+  <form id="onboarding-form" onsubmit="submitForm(event)">
+
+    <!-- Section 1: Business Info -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">1</span>
+        <h2>Your Business</h2>
+      </div>
+      <p class="section-desc">The basics — used in your bot's answers.</p>
+
+      <div class="field">
+        <label>Business Name <span class="required">*</span></label>
+        <input type="text" name="biz_name" required placeholder="e.g. Café Lumière Montreal" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Industry / Type <span class="required">*</span></label>
+          <select name="industry" required>
+            <option value="">Choose one...</option>
+            <option>Restaurant / Café</option>
+            <option>Beauty / Spa / Salon</option>
+            <option>Healthcare / Clinic</option>
+            <option>Professional Services (lawyer, accountant)</option>
+            <option>Real Estate</option>
+            <option>Retail / E-commerce</option>
+            <option>Fitness / Gym</option>
+            <option>Construction / Trades</option>
+            <option>Hotel / Tourism</option>
+            <option>Education / Tutoring</option>
+            <option>Auto / Mechanic</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Website (if any)</label>
+          <input type="url" name="website" placeholder="https://yourbusiness.com" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Address</label>
+        <input type="text" name="address" placeholder="123 Boulevard St-Laurent, Montreal, QC" />
+      </div>
+    </div>
+
+    <!-- Section 2: Contact -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">2</span>
+        <h2>Contact Info</h2>
+      </div>
+      <p class="section-desc">How customers should reach you.</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Your Name <span class="required">*</span></label>
+          <input type="text" name="contact_name" required placeholder="Jean Tremblay" />
+        </div>
+        <div class="field">
+          <label>Your Email <span class="required">*</span></label>
+          <input type="email" name="contact_email" required placeholder="you@business.com" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Business Phone <span class="required">*</span></label>
+          <input type="tel" name="biz_phone" required placeholder="(514) 555-0100" />
+        </div>
+        <div class="field">
+          <label>Public Email (for the bot)</label>
+          <input type="email" name="biz_email" placeholder="info@business.com" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Hours -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">3</span>
+        <h2>Hours of Operation</h2>
+      </div>
+      <p class="section-desc">When you're open. Type freely — like you'd tell a customer.</p>
+
+      <div class="field">
+        <label>Hours <span class="required">*</span></label>
+        <textarea name="hours" required placeholder="Mon-Fri: 9am-6pm&#10;Sat: 10am-4pm&#10;Sun: Closed"></textarea>
+        <div class="field-hint">Use natural language. E.g. "Monday to Friday 9am to 6pm"</div>
+      </div>
+    </div>
+
+    <!-- Section 4: Services -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">4</span>
+        <h2>Your Services</h2>
+      </div>
+      <p class="section-desc">What you sell or do. List your main services.</p>
+
+      <div class="field">
+        <label>Main Services / Products <span class="required">*</span></label>
+        <textarea name="services" required placeholder="• Espresso & specialty drinks&#10;• Pastries & breakfast&#10;• Catering for events&#10;• Wifi workspace"></textarea>
+        <div class="field-hint">One per line. Add prices if you want them in the bot's answers.</div>
+      </div>
+
+      <div class="field">
+        <label>Pricing Info (optional)</label>
+        <textarea name="pricing" placeholder="Coffee: $4-6&#10;Pastries: $3-5&#10;Catering: starts at $200"></textarea>
+        <div class="field-hint">Or write "varies — contact us" if you prefer not to share publicly.</div>
+      </div>
+    </div>
+
+    <!-- Section 5: Languages -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">5</span>
+        <h2>Languages</h2>
+      </div>
+      <p class="section-desc">What languages do your customers speak?</p>
+
+      <div class="checks" id="languages">
+        <label class="check-pill"><input type="checkbox" name="lang" value="en" checked />English</label>
+        <label class="check-pill"><input type="checkbox" name="lang" value="fr" checked />Français</label>
+        <label class="check-pill"><input type="checkbox" name="lang" value="ar" />العربية</label>
+        <label class="check-pill"><input type="checkbox" name="lang" value="es" />Español</label>
+        <label class="check-pill"><input type="checkbox" name="lang" value="zh" />中文</label>
+        <label class="check-pill"><input type="checkbox" name="lang" value="other" />Other</label>
+      </div>
+    </div>
+
+    <!-- Section 6: FAQ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">6</span>
+        <h2>Customer Questions</h2>
+      </div>
+      <p class="section-desc">Top 5–10 questions your customers ask. <strong>This is the most important part.</strong></p>
+
+      <div id="faq-list"></div>
+
+      <button type="button" class="btn add" onclick="addFAQ()">+ Add a question</button>
+    </div>
+
+    <!-- Section 7: Brand -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">7</span>
+        <h2>Brand & Style</h2>
+      </div>
+      <p class="section-desc">How should your bot sound?</p>
+
+      <div class="field">
+        <label>Brand Personality</label>
+        <select name="tone">
+          <option>Friendly & casual</option>
+          <option>Professional & formal</option>
+          <option>Warm & welcoming</option>
+          <option>Playful & fun</option>
+          <option>Direct & efficient</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Primary brand color (optional)</label>
+        <input type="text" name="color" placeholder="e.g. #166534 or 'forest green'" />
+        <div class="field-hint">Hex code or just describe it.</div>
+      </div>
+
+      <div class="field">
+        <label>Anything else I should know?</label>
+        <textarea name="notes" placeholder="Special policies, things to avoid, target audience details..."></textarea>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-area">
+      <h3>Ready to launch?</h3>
+      <p>I'll review your info and have your chatbot ready in 24 hours. You'll get a live URL to test before going live on your site.</p>
+      <button type="submit" class="btn primary large">Submit & Build My Chatbot</button>
+    </div>
+
+  </form>
+
+  <!-- Success state (hidden by default) -->
+  <div id="success" style="display:none;">
+    <div class="success-screen">
+      <div class="icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Got it! Your info is saved.</h2>
+      <p>Download the file below and send it to me. I'll have your chatbot ready in 24 hours.</p>
+
+      <div class="summary-box" id="summary"></div>
+
+      <button class="btn primary" onclick="downloadJSON()">📥 Download My Info (.json)</button>
+      <button class="btn" style="margin-left: 8px;" onclick="copyEmail()">✉️ Copy Email Body</button>
+      <p style="margin-top: 16px; font-size: 12px;">Then email the JSON file to: <strong>your@email.com</strong></p>
+    </div>
+  </div>
+
+  <p class="footer-note">Powered by AI Chatbot Service · Your info is only used to build your bot.</p>
+
+</div>
+
+<script>
+let faqs = [];
+let formData = null;
+
+function addFAQ(question = '', answer = '') {
+  const id = Date.now() + Math.random();
+  faqs.push({ id, question, answer });
+  renderFAQs();
+}
+
+function deleteFAQ(id) {
+  faqs = faqs.filter(f => f.id !== id);
+  renderFAQs();
+}
+
+function renderFAQs() {
+  const list = document.getElementById('faq-list');
+  list.innerHTML = '';
+  faqs.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.className = 'faq-item';
+    div.innerHTML = `
+      <div class="faq-num">#${i+1}</div>
+      <div class="field">
+        <label>Question customers ask</label>
+        <input type="text" placeholder="e.g. Do you offer takeout?" value="${escapeHtml(f.question)}" oninput="updateFAQ(${f.id}, 'question', this.value)" />
+      </div>
+      <div class="field" style="margin-bottom: 4px;">
+        <label>Your answer</label>
+        <textarea placeholder="e.g. Yes! Order online at our website or call us." oninput="updateFAQ(${f.id}, 'answer', this.value)">${escapeHtml(f.answer)}</textarea>
+      </div>
+      <div class="faq-actions">
+        <button type="button" class="btn danger" onclick="deleteFAQ(${f.id})">Remove</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function updateFAQ(id, field, val) {
+  const f = faqs.find(x => x.id === id);
+  if (f) f[field] = val;
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// Toggle check pills
+document.querySelectorAll('.check-pill').forEach(pill => {
+  const input = pill.querySelector('input');
+  if (input.checked) pill.classList.add('checked');
+  pill.addEventListener('click', e => {
+    if (e.target.tagName !== 'INPUT') input.checked = !input.checked;
+    pill.classList.toggle('checked', input.checked);
+  });
+});
+
+function submitForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = {};
+
+  // Collect all fields
+  new FormData(form).forEach((value, key) => {
+    if (data[key]) {
+      if (Array.isArray(data[key])) data[key].push(value);
+      else data[key] = [data[key], value];
+    } else {
+      data[key] = value;
+    }
+  });
+
+  data.faqs = faqs.filter(f => f.question || f.answer);
+  data.submitted_at = new Date().toISOString();
+
+  formData = data;
+
+  // Show summary
+  const summary = `
+<strong>Business:</strong> ${escapeHtml(data.biz_name)}<br>
+<strong>Contact:</strong> ${escapeHtml(data.contact_name)} · ${escapeHtml(data.contact_email)}<br>
+<strong>Industry:</strong> ${escapeHtml(data.industry)}<br>
+<strong>Phone:</strong> ${escapeHtml(data.biz_phone)}<br>
+<strong>Languages:</strong> ${Array.isArray(data.lang) ? data.lang.join(', ') : data.lang}<br>
+<strong>FAQs:</strong> ${data.faqs.length} questions
+`;
+  document.getElementById('summary').innerHTML = summary;
+
+  // Hide form, show success
+  document.getElementById('onboarding-form').style.display = 'none';
+  document.querySelector('.header').style.display = 'none';
+  document.querySelector('.progress').style.display = 'none';
+  document.getElementById('success').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadJSON() {
+  const blob = new Blob([JSON.stringify(formData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (formData.biz_name || 'client').replace(/\s+/g, '-').toLowerCase() + '-onboarding.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyEmail() {
+  const body = `Hi! Here's my chatbot setup info.\n\nBusiness: ${formData.biz_name}\nContact: ${formData.contact_name}\nPhone: ${formData.biz_phone}\n\nFile attached. Let me know if you need anything else!`;
+  navigator.clipboard.writeText(body).then(() => alert('Email body copied! Paste it into your email.'));
+}
+
+// Init with 3 empty FAQs
+addFAQ();
+addFAQ();
+addFAQ();
+</script>
+
+</body>
+</html>
